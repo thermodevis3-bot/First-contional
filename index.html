@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>First Conditional Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: arcade cabinet. Chunky title, four game tabs, one big stage per mode. */
+:root{
+  --ink:#0D1030;
+  --panel:#171C4A;
+  --panel-2:#212868;
+  --line:#3A4390;
+  --text:#F5F7FF;
+  --muted:#B4BCEB;
+  --yellow:#FFD23F;
+  --cyan:#35E0D2;
+  --pink:#FF4F8B;
+  --lime:#9BEF3C;
+  --orange:#FF8A3D;
+  --periwinkle:#8EA2FF;
+  --ok:#3DDC84;
+  --bad:#FF5A5F;
+  --font-display:'Lilita One','Trebuchet MS',system-ui,sans-serif;
+  --font-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.5;
+  color:var(--text);
+  background-color:var(--ink);
+  background-image:radial-gradient(rgba(255,255,255,.07) 1.5px,transparent 1.6px);
+  background-size:26px 26px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:18px 56px;
+}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:18px}
+h1,h2,h3,p{margin:0}
+h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:.01em}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+
+/* Header */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.kicker{display:block;font-weight:800;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--lime)}
+h1{font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:clamp(2.1rem,7vw,4rem);line-height:.98;letter-spacing:.01em;margin-top:6px;text-wrap:balance;text-shadow:0 4px 0 rgba(0,0,0,.4)}
+h1 .w1{color:var(--yellow)} h1 .w2{color:var(--cyan)} h1 .w3{color:var(--pink)}
+.hud{display:flex;gap:10px;align-items:center}
+.xp{display:flex;align-items:baseline;gap:8px;background:var(--panel);border:3px solid var(--line);border-radius:14px;padding:6px 14px}
+.xp span{font-weight:800;font-size:.75rem;letter-spacing:.14em;color:var(--muted)}
+.xp b{font-family:var(--font-display);font-weight:400;font-size:1.6rem;color:var(--yellow);font-variant-numeric:tabular-nums}
+.bump{animation:bump .35s ease}
+
+/* Buttons */
+.btn{font-family:var(--font-display);font-size:1.05rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);background:var(--yellow);border:3px solid var(--ink);border-radius:14px;padding:.6em 1.2em;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.45);transition:transform .08s,box-shadow .08s,filter .15s}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+.btn.cyan{background:var(--cyan)} .btn.pink{background:var(--pink)} .btn.lime{background:var(--lime)} .btn.orange{background:var(--orange)}
+.btn.ghost{background:var(--panel-2);color:var(--text);border-color:var(--line)}
+.btn.big{font-size:1.5rem;padding:.65em 1.6em}
+.btn.small{font-size:.9rem;padding:.45em .95em}
+
+/* Tabs */
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.tab{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:1rem;background:var(--panel);color:var(--muted);border:3px solid var(--line);border-radius:14px;padding:.7em .4em;cursor:pointer;transition:transform .1s,background .15s}
+.tab:hover{transform:translateY(-2px);color:var(--text)}
+.tab.active{background:var(--tc);color:var(--ink);border-color:var(--ink);box-shadow:0 5px 0 rgba(0,0,0,.45)}
+
+/* Panels */
+.panel{background:var(--panel);border:3px solid var(--line);border-radius:20px;padding:clamp(16px,3vw,26px);box-shadow:0 8px 0 rgba(0,0,0,.3);min-width:0}
+.mode-head{display:grid;gap:4px}
+.mode-head h2{font-size:clamp(1.7rem,4.5vw,2.4rem);text-transform:uppercase}
+.mode-head p{color:var(--muted);max-width:62ch}
+.view{display:grid;gap:18px}
+
+/* Learn */
+.lead{font-size:clamp(1.1rem,2.6vw,1.4rem);font-weight:700;max-width:60ch}
+.formula{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin-top:16px}
+.fbox{display:grid;gap:2px;padding:14px 20px;border-radius:16px;border:3px solid var(--ink);color:var(--ink);box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.fbox b{font-family:var(--font-display);font-weight:400;font-size:clamp(1.3rem,4vw,2rem);letter-spacing:.02em}
+.fbox small{font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem}
+.fb-if{background:var(--cyan)} .fb-res{background:var(--pink)}
+.fcomma{font-family:var(--font-display);font-size:2.6rem;line-height:1;align-self:flex-end;color:var(--yellow)}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.ex{background:var(--panel-2);border:3px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.tag{justify-self:start;font-weight:800;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--yellow);border-radius:999px;padding:.15em .7em}
+.ex p{font-size:1.15rem;font-weight:700}
+.part-if{color:var(--cyan)} .part-res{color:var(--pink)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rule h3{font-size:1.25rem;color:var(--lime);margin-bottom:4px}
+.rule p{color:var(--muted)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.section-title{font-size:1.5rem;text-transform:uppercase;margin-bottom:12px}
+
+/* Roulette */
+.roulette-grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;align-items:start}
+.wheel-card{display:grid;gap:16px;justify-items:center}
+.wheel-box{position:relative;width:100%;max-width:400px;aspect-ratio:1}
+#wheel{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 0 rgba(0,0,0,.35))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:36px solid var(--text);filter:drop-shadow(0 3px 0 rgba(0,0,0,.5));z-index:2}
+.mini-stats{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;color:var(--muted);font-weight:800}
+.mini-stats b{font-family:var(--font-display);font-weight:400;font-size:1.25rem;color:var(--yellow);margin-left:4px}
+.q-card{min-height:340px;display:grid;gap:14px;align-content:start}
+.q-empty{display:grid;gap:6px;align-content:center;justify-items:center;text-align:center;min-height:280px;color:var(--muted)}
+.q-empty .big{font-family:var(--font-display);font-size:2.4rem;color:var(--yellow)}
+.q-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.cat-pill{display:inline-block;padding:.25em .9em;border-radius:999px;background:var(--c);color:var(--ink);font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+.worth{font-weight:800;font-size:.82rem;color:var(--muted)}
+.qtext{font-size:clamp(1.2rem,3.4vw,1.65rem);font-weight:800;line-height:1.45}
+.es{color:var(--yellow)}
+.hintline{color:var(--muted);font-weight:700}
+input.blank{font:inherit;font-weight:800;color:var(--yellow);background:var(--ink);border:0;border-bottom:3px dashed var(--yellow);border-radius:8px 8px 0 0;padding:.1em .4em;text-align:center;width:9ch;max-width:100%}
+textarea.free{font:inherit;font-weight:700;color:var(--text);background:var(--ink);border:3px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;resize:vertical;min-height:84px}
+textarea.free:focus,input.blank:focus{outline:3px solid var(--cyan);outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;font-weight:800;font-size:1.05rem;color:var(--text);background:var(--panel-2);border:3px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;transition:transform .08s,background .15s;min-width:0;overflow-wrap:anywhere}
+.opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--bc,var(--yellow))}
+.opt:disabled{cursor:default}
+.opt .badge{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--bc,var(--yellow));color:var(--ink);font-family:var(--font-display);font-size:1.1rem}
+.opt[data-k="0"],.opt[data-i="0"]{--bc:var(--pink)} .opt[data-k="1"],.opt[data-i="1"]{--bc:var(--cyan)}
+.opt[data-k="2"],.opt[data-i="2"]{--bc:var(--yellow)} .opt[data-k="3"],.opt[data-i="3"]{--bc:var(--lime)}
+.opt.correct{background:var(--ok);color:var(--ink);border-color:var(--ink);animation:pulse .5s ease}
+.opt.wrong{background:var(--bad);color:var(--ink);border-color:var(--ink)}
+.opt.dim{opacity:.5}
+.opts.two .opt{justify-content:center;font-family:var(--font-display);font-size:1.5rem;text-transform:uppercase;padding:18px}
+.fb{margin-top:4px;padding:12px 16px;border-radius:14px;border:3px solid;font-weight:700}
+.fb.good{border-color:var(--ok);background:rgba(61,220,132,.13)}
+.fb.bad{border-color:var(--bad);background:rgba(255,90,95,.13)}
+.fb strong{font-family:var(--font-display);font-weight:400;font-size:1.2rem;margin-right:6px}
+.pts{display:inline-block;margin-left:6px;color:var(--yellow);font-weight:800}
+.answer-zone,.bank{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:10px;border-radius:14px}
+.answer-zone{border:3px dashed var(--line);background:var(--ink);align-items:center}
+.placeholder{color:var(--muted);font-weight:700}
+.tile{font-weight:800;color:var(--text);background:var(--panel-2);border:3px solid var(--line);border-radius:10px;padding:.35em .8em;cursor:pointer;transition:transform .08s}
+.tile:hover:not(:disabled){transform:translateY(-2px);border-color:var(--yellow)}
+.tile:disabled{opacity:.3;cursor:default}
+.answer-zone .tile{background:var(--yellow);color:var(--ink);border-color:var(--ink)}
+.shake{animation:shake .45s}
+
+/* Lottery */
+.lot-bar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;justify-content:space-between}
+.lot-stats{display:flex;flex-wrap:wrap;gap:6px 20px;color:var(--muted);font-weight:800}
+.lot-stats b{font-family:var(--font-display);font-weight:400;font-size:1.25rem;color:var(--yellow);margin-left:4px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-weight:800;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cell{position:relative;display:grid;place-items:center;text-align:center;min-height:92px;padding:8px;font-weight:800;font-size:clamp(.74rem,2.2vw,1.02rem);line-height:1.25;overflow-wrap:anywhere;hyphens:auto;border:3px solid;border-radius:14px;cursor:pointer;color:var(--text);transition:transform .1s,background .2s}
+.cell.if{background:rgba(53,224,210,.13);border-color:var(--cyan);color:#BFF8F3}
+.cell.res{background:rgba(255,79,139,.13);border-color:var(--pink);color:#FFC4D8}
+.cell:hover:not(:disabled){transform:translateY(-2px)}
+.cell.sel{border-color:var(--yellow);background:rgba(255,210,63,.22);color:var(--yellow);transform:scale(1.05);z-index:1}
+.cell.matched{background:var(--pc);border-color:var(--ink);color:var(--ink);cursor:default}
+.cell.matched::after{content:"\2713";position:absolute;top:4px;right:8px;font-size:.95rem}
+.cell.wrong{animation:shake .4s;border-color:var(--bad)}
+.cell.hint{animation:pulse .6s ease 3;border-color:var(--yellow);box-shadow:0 0 0 4px rgba(255,210,63,.4)}
+.banner{padding:14px 18px;border-radius:16px;border:3px solid var(--yellow);background:rgba(255,210,63,.12);font-weight:800;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.banner.bad{border-color:var(--bad);background:rgba(255,90,95,.12)}
+.banner.win{border-color:var(--lime);background:rgba(155,239,60,.14)}
+.banner strong{font-family:var(--font-display);font-weight:400;font-size:1.3rem;margin-right:8px;color:var(--yellow)}
+
+/* Quiz */
+.rules-list{margin:10px 0 18px;padding-left:1.2em;color:var(--muted);font-weight:700;display:grid;gap:4px}
+.rules-list b{color:var(--text)}
+.name-row{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:6px}
+.name-row label{display:grid;gap:4px;font-weight:800;color:var(--muted);flex:1 1 220px}
+.name-row input{font:inherit;font-weight:800;color:var(--text);background:var(--ink);border:3px solid var(--line);border-radius:12px;padding:10px 14px;width:100%}
+.progress{height:12px;border-radius:999px;background:var(--ink);border:3px solid var(--line);overflow:hidden}
+.progress div{height:100%;width:0;background:var(--cyan);transition:width .4s ease}
+.qz-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 18px;margin-top:8px;font-weight:800;color:var(--muted)}
+.qz-meta b{font-family:var(--font-display);font-weight:400;color:var(--yellow);font-size:1.15rem;margin-left:4px;font-variant-numeric:tabular-nums}
+.timer-row{display:flex;align-items:center;gap:12px;margin:14px 0}
+.timer{flex:1;height:18px;border-radius:999px;background:var(--ink);border:3px solid var(--line);overflow:hidden}
+.timer div{height:100%;width:100%;background:var(--lime)}
+.timer.low div{background:var(--bad)}
+.timer-num{font-family:var(--font-display);font-size:1.8rem;min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}
+.qz-q{font-size:clamp(1.3rem,3.8vw,2rem);text-transform:none;line-height:1.3;margin-bottom:16px;text-wrap:balance}
+.qz-next{margin-top:14px}
+.end-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.score-big{font-family:var(--font-display);font-size:clamp(3rem,13vw,5.5rem);line-height:1;color:var(--yellow);font-variant-numeric:tabular-nums}
+.score-label{font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-size:.8rem}
+.stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.stat{background:var(--panel-2);border:3px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--font-display);font-weight:400;font-size:1.6rem;color:var(--cyan)}
+.stat span{font-weight:800;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rank{display:inline-block;font-family:var(--font-display);font-size:1.4rem;text-transform:uppercase;color:var(--ink);background:var(--rc,var(--yellow));padding:.2em .8em;border-radius:12px;box-shadow:0 4px 0 rgba(0,0,0,.4);margin-bottom:8px}
+.board-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.board-list li{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;background:var(--panel-2);border:3px solid var(--line);border-radius:12px;font-weight:800}
+.board-list li.me{border-color:var(--yellow);background:rgba(255,210,63,.16)}
+.board-list .pos{font-family:var(--font-display);font-size:1.2rem;color:var(--cyan)}
+.board-list .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board-list .bot{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:6px}
+.board-list .sc{font-variant-numeric:tabular-nums;color:var(--yellow)}
+.sep{text-align:center;color:var(--muted);font-weight:800;letter-spacing:.3em}
+
+/* Effects */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+.pop{position:fixed;z-index:60;transform:translate(-50%,-10px);font-family:var(--font-display);font-size:1.8rem;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.5);pointer-events:none;animation:rise 1s ease-out forwards}
+@keyframes rise{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-60px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+@media (max-width:820px){
+  .roulette-grid,.end-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .board{gap:6px}
+  .cell{min-height:98px;padding:6px;font-size:.72rem}
+  .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats3{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <span class="kicker">English Arcade</span>
+      <h1><span class="w1">First</span> <span class="w2">Conditional</span> <span class="w3">Challenge</span></h1>
+    </div>
+    <div class="hud">
+      <div class="xp" title="Points from all games"><span>XP</span><b id="xp">0</b></div>
+      <button class="btn small ghost" id="soundBtn" aria-pressed="true">Sound: On</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Game modes">
+    <button class="tab" role="tab" data-view="learn" style="--tc:var(--lime)">Learn</button>
+    <button class="tab" role="tab" data-view="roulette" style="--tc:var(--pink)">Roulette</button>
+    <button class="tab" role="tab" data-view="lottery" style="--tc:var(--cyan)">Lottery</button>
+    <button class="tab" role="tab" data-view="quiz" style="--tc:var(--yellow)">Quiz</button>
+  </nav>
+
+  <!-- LEARN -->
+  <section id="view-learn" class="view">
+    <div class="panel">
+      <h2 class="section-title">What is the First Conditional?</h2>
+      <p class="lead">We use the First Conditional to talk about possible situations in the future and their results. If the condition happens, the result will happen too.</p>
+      <div class="formula" role="group" aria-label="First Conditional structure">
+        <div class="fbox fb-if"><b>IF + PRESENT SIMPLE</b><small>the condition</small></div>
+        <span class="fcomma" aria-hidden="true">,</span>
+        <div class="fbox fb-res"><b>WILL + BASE VERB</b><small>the result</small></div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title">Examples</h2>
+      <div class="ex-grid">
+        <article class="ex"><span class="tag">Weather</span><p><span class="part-if">If it rains,</span> <span class="part-res">I will stay home.</span></p></article>
+        <article class="ex"><span class="tag">School</span><p><span class="part-if">If I study,</span> <span class="part-res">I will pass the exam.</span></p></article>
+        <article class="ex"><span class="tag">Practice</span><p><span class="part-if">If she practices,</span> <span class="part-res">she will improve.</span></p></article>
+        <article class="ex"><span class="tag">Transport</span><p><span class="part-if">If we don't hurry,</span> <span class="part-res">we will miss the bus.</span></p></article>
+      </div>
+    </div>
+
+    <div class="rules">
+      <div class="panel rule"><h3>Present simple after IF</h3><p>Never say &ldquo;If it will rain&rdquo;. Say &ldquo;If it rains&rdquo;. The future form goes in the result only.</p></div>
+      <div class="panel rule"><h3>Will + base verb</h3><p>The result uses will and the base verb: I will stay, she will improve, we will miss.</p></div>
+      <div class="panel rule"><h3>Commas and negatives</h3><p>Use a comma when IF comes first. Use don't or doesn't after IF, and won't in the result.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Pick a game</h2>
+      <div class="cta-row">
+        <button class="btn pink" data-go="roulette">Spin the Roulette</button>
+        <button class="btn cyan" data-go="lottery">Play Lottery</button>
+        <button class="btn" data-go="quiz">Start the Quiz</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROULETTE -->
+  <section id="view-roulette" class="view" hidden>
+    <div class="mode-head">
+      <h2>Roulette</h2>
+      <p>Spin the wheel. It picks a random category, then you answer a First Conditional question. Correct answers give 100 points, challenges give 200, and 3 in a row adds a 50 point bonus.</p>
+    </div>
+    <div class="roulette-grid">
+      <div class="panel wheel-card">
+        <div class="wheel-box">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" width="800" height="800" role="img" aria-label="Prize wheel with six question categories"></canvas>
+        </div>
+        <button class="btn pink big" id="spinBtn">Spin!</button>
+        <div class="mini-stats">
+          <span>Streak<b id="rStreak">0</b></span>
+          <span>Correct<b id="rCorrect">0</b></span>
+          <span>Played<b id="rPlayed">0</b></span>
+        </div>
+      </div>
+      <div class="panel q-card" id="rQuestion" aria-live="polite">
+        <div class="q-empty"><p class="big">Ready?</p><p>Press SPIN to pick a category and get your first question.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOTTERY -->
+  <section id="view-lottery" class="view" hidden>
+    <div class="mode-head">
+      <h2>Lottery</h2>
+      <p>Tap an IF card, then tap the result that belongs to it. Matched pairs light up. Complete a full row, column or diagonal for a line bonus, or clear the whole board to win.</p>
+    </div>
+    <div class="panel">
+      <div class="lot-bar">
+        <div class="lot-stats">
+          <span>Pairs<b id="lotPairs">0/8</b></span>
+          <span>Lines<b id="lotLines">0</b></span>
+          <span>Mistakes<b id="lotMistakes">0</b></span>
+        </div>
+        <div class="actions">
+          <button class="btn small lime" id="lotHint">Hint (-25 XP)</button>
+          <button class="btn small ghost" id="lotNew">New board</button>
+        </div>
+      </div>
+      <div class="legend" style="margin:14px 0"><span><i style="background:var(--cyan)"></i>IF cards</span><span><i style="background:var(--pink)"></i>Result cards</span><span><i style="background:var(--lime)"></i>Matched</span></div>
+      <div class="board" id="board"></div>
+    </div>
+    <div class="banner" id="lotBanner" aria-live="polite"><span>Tap an IF card to start.</span></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="view-quiz" class="view" hidden>
+    <div class="mode-head">
+      <h2>Kahoot Quiz</h2>
+      <p>15 questions, 15 seconds each. Answer fast and keep your streak alive to climb the leaderboard.</p>
+    </div>
+
+    <div class="panel" id="qzIntro">
+      <div class="name-row">
+        <label for="playerName">Your nickname
+          <input id="playerName" type="text" maxlength="14" value="Player" autocomplete="off">
+        </label>
+        <button class="btn big" id="qzStart">Start quiz</button>
+      </div>
+      <ul class="rules-list">
+        <li>Correct answer: <b>+100 points</b>. Wrong or no answer: <b>0</b>.</li>
+        <li>Speed bonus: up to <b>+50 points</b> for fast answers.</li>
+        <li>Streak bonus: from 3 correct in a row, up to <b>+125 points</b> per answer.</li>
+      </ul>
+      <div id="introBoardWrap" hidden>
+        <h3 class="section-title" style="margin:6px 0 0">Class leaderboard</h3>
+        <ol class="board-list" id="introBoard"></ol>
+      </div>
+    </div>
+
+    <div class="panel" id="qzPlay" hidden>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" id="qzProgress"><div id="qzBar"></div></div>
+      <div class="qz-meta"><span id="qzNum">Question 1 / 15</span><span>Score<b id="qzScore">0</b></span><span>Streak<b id="qzStreak">0</b></span></div>
+      <div class="timer-row"><div class="timer" id="timer"><div id="timerFill"></div></div><span class="timer-num" id="timerNum">15</span></div>
+      <h3 class="qz-q" id="qzText"></h3>
+      <div class="opts" id="qzOpts"></div>
+      <div id="qzFb" aria-live="polite"></div>
+      <button class="btn cyan qz-next" id="qzNext" hidden>Next question</button>
+    </div>
+
+    <div id="qzEnd" hidden>
+      <div class="end-grid">
+        <div class="panel">
+          <span class="score-label">Final score</span>
+          <div class="score-big" id="endScore">0</div>
+          <div class="stats3">
+            <div class="stat"><b id="endPct">0%</b><span>Correct</span></div>
+            <div class="stat"><b id="endCorrect">0/15</b><span>Answers right</span></div>
+            <div class="stat"><b id="endStreak">0</b><span>Best streak</span></div>
+          </div>
+          <div class="rank" id="endRank">Rookie</div>
+          <p class="lead" id="endMsg"></p>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn lime" id="qzAgain">Play again</button>
+            <button class="btn ghost" data-go="roulette">Try the Roulette</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3 class="section-title" style="margin:0">Leaderboard</h3>
+          <ol class="board-list" id="leaders"></ol>
+          <p class="hintline" id="boardNote" style="margin-top:10px;font-size:.85rem">Players marked BOT are practice rivals. Your scores are saved on this device.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+/* ===== SETUP =====
+   Paste your Google Apps Script Web App URL between the quotes (it ends in /exec).
+   Leave it empty to keep scores only on each player's own device. */
+var SCORES_URL = 'https://script.google.com/macros/s/AKfycbwSwbb7_-K78gMeAaR7BT3fRJHqFSVg6QmMUCvhyxB5dQA6IBJevKjpwKy1D1yco0bl4A/exec';
+
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var TAU=Math.PI*2;
+var reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+function mod(a,n){return ((a%n)+n)%n;}
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function norm(s){return String(s).toLowerCase().replace(/[‘’`]/g,"'").replace(/[.!?]+$/,'').replace(/\s+/g,' ').trim();}
+
+/* ---------- XP / HUD ---------- */
+var xp=0, xpEl=$('#xp');
+function addXP(n){
+  xp=Math.max(0,xp+n);
+  xpEl.textContent=xp.toLocaleString('en-US');
+  xpEl.classList.remove('bump');void xpEl.offsetWidth;xpEl.classList.add('bump');
+}
+
+/* ---------- Sound ---------- */
+var soundOn=true, ac=null;
+function tone(f,d,type,vol,when){
+  if(!soundOn) return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    var t=ac.currentTime+(when||0);
+    var o=ac.createOscillator(), g=ac.createGain();
+    o.type=type||'sine';
+    o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(vol||.07,t);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(ac.destination);
+    o.start(t);o.stop(t+d+.02);
+  }catch(e){}
+}
+var sfx={
+  tick:function(){tone(900,.04,'square',.03);},
+  click:function(){tone(520,.05,'triangle',.04);},
+  ok:function(){tone(660,.12,'triangle',.07);tone(990,.2,'triangle',.07,.1);},
+  bad:function(){tone(180,.3,'sawtooth',.06);},
+  win:function(){[523,659,784,1047].forEach(function(f,i){tone(f,.22,'triangle',.07,i*.12);});}
+};
+$('#soundBtn').addEventListener('click',function(){
+  soundOn=!soundOn;
+  this.textContent='Sound: '+(soundOn?'On':'Off');
+  this.setAttribute('aria-pressed',soundOn?'true':'false');
+  if(soundOn) sfx.click();
+});
+
+/* ---------- Effects ---------- */
+var fx=$('#fx'), fctx=fx.getContext('2d'), parts=[], fxRun=false;
+function sizeFx(){fx.width=window.innerWidth;fx.height=window.innerHeight;}
+sizeFx();window.addEventListener('resize',sizeFx);
+function burst(x,y,n){
+  if(reduce) return;
+  var colors=['#FFD23F','#35E0D2','#FF4F8B','#9BEF3C','#FF8A3D'];
+  for(var i=0;i<n;i++){
+    var a=Math.random()*TAU, s=3+Math.random()*7;
+    parts.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-4,g:.22,r:3+Math.random()*4,c:colors[i%colors.length],life:60+Math.random()*30,rot:Math.random()*TAU,vr:(Math.random()-.5)*.4});
+  }
+  if(!fxRun){fxRun=true;requestAnimationFrame(stepFx);}
+}
+function stepFx(){
+  fctx.clearRect(0,0,fx.width,fx.height);
+  parts=parts.filter(function(p){return p.life>0;});
+  parts.forEach(function(p){
+    p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.vx*=.99;p.rot+=p.vr;p.life--;
+    fctx.save();fctx.translate(p.x,p.y);fctx.rotate(p.rot);
+    fctx.fillStyle=p.c;fctx.globalAlpha=Math.min(1,p.life/30);
+    fctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);fctx.restore();
+  });
+  if(parts.length){requestAnimationFrame(stepFx);}else{fxRun=false;fctx.clearRect(0,0,fx.width,fx.height);}
+}
+function burstAt(el,n){var r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+Math.min(r.height/2,200),n);}
+function pop(text,el){
+  var r=el.getBoundingClientRect();
+  var s=document.createElement('span');
+  s.className='pop';s.textContent=text;
+  s.style.left=(r.left+r.width/2)+'px';
+  s.style.top=(r.top+r.height/2)+'px';
+  document.body.appendChild(s);
+  setTimeout(function(){s.remove();},1000);
+}
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake');},500);}
+
+/* ---------- Navigation ---------- */
+var VIEWS=['learn','roulette','lottery','quiz'];
+function show(name){
+  if(VIEWS.indexOf(name)<0) name='learn';
+  if(name!=='quiz') abandonQuiz();
+  VIEWS.forEach(function(v){$('#view-'+v).hidden=(v!==name);});
+  $$('.tab').forEach(function(t){
+    var on=t.getAttribute('data-view')===name;
+    t.classList.toggle('active',on);
+    t.setAttribute('aria-selected',on?'true':'false');
+  });
+  if(name==='quiz'&&!quiz.active) loadIntroBoard();
+}
+function go(name){
+  try{if(location.hash!=='#'+name) location.hash=name;}catch(e){}
+  show(name);
+  window.scrollTo(0,0);
+}
+$$('.tab').forEach(function(t){t.addEventListener('click',function(){go(t.getAttribute('data-view'));});});
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-go]');
+  if(b) go(b.getAttribute('data-go'));
+});
+window.addEventListener('hashchange',function(){show(location.hash.slice(1));});
+
+/* ====================================================
+   ROULETTE
+   ==================================================== */
+var CATS=[
+  {id:'complete',name:'Complete the sentence',lines:['Complete','the sentence'],color:'#FF4F8B'},
+  {id:'choose',name:'Choose the correct answer',lines:['Choose the','correct answer'],color:'#35E0D2'},
+  {id:'translate',name:'Translate the sentence',lines:['Translate','the sentence'],color:'#FFD23F'},
+  {id:'make',name:'Make your own sentence',lines:['Make your own','sentence'],color:'#9BEF3C'},
+  {id:'tf',name:'True or False',lines:['True or','False'],color:'#FF8A3D'},
+  {id:'challenge',name:'Challenge Question',lines:['Challenge','Question'],color:'#8EA2FF'}
+];
+
+var QB={
+  complete:[
+    {q:"If it rains tomorrow, we ____ (stay) at home.",answers:["will stay","'ll stay"],why:"After IF + present simple, the result uses will + base verb."},
+    {q:"If you ____ (study) hard, you will pass the test.",answers:["study"],why:"The IF part uses present simple, never will."},
+    {q:"If she ____ (not / hurry), she will miss the train.",answers:["doesn't hurry","does not hurry"],why:"Negative present simple with she: doesn't + base verb."},
+    {q:"If they win the match, they ____ (celebrate) all night.",answers:["will celebrate","'ll celebrate"],why:"The result needs will + base verb."},
+    {q:"If I see Tom, I ____ (tell) him the news.",answers:["will tell","'ll tell"],why:"The result needs will + base verb."},
+    {q:"If we ____ (leave) now, we will arrive on time.",answers:["leave"],why:"After IF, use present simple: we leave."},
+    {q:"If he ____ (not / eat) breakfast, he will feel hungry.",answers:["doesn't eat","does not eat"],why:"Negative present simple with he: doesn't + base verb."},
+    {q:"If it is sunny on Saturday, we ____ (go) to the beach.",answers:["will go","'ll go"],why:"The result needs will + base verb."}
+  ],
+  choose:[
+    {q:"If I win the lottery next week, I ____ a new car.",o:["will buy","would buy","bought","buying"],why:"Result clause: will + base verb."},
+    {q:"If she ____ tomorrow, she will get a good grade.",o:["studies","will study","studied","studying"],why:"After IF, use present simple."},
+    {q:"If we don't hurry, we ____ the bus.",o:["will miss","would miss","missed","missing"],why:"Result clause: will + base verb."},
+    {q:"They will be late if they ____ the early train.",o:["miss","will miss","missed","missing"],why:"The IF part stays in present simple, even at the end."},
+    {q:"If it ____ this weekend, we will have a picnic.",o:["doesn't rain","won't rain","didn't rain","not raining"],why:"Negative IF part: doesn't + base verb."},
+    {q:"If you help me, I ____ you a coffee.",o:["will buy","would buy","bought","buying"],why:"Result clause: will + base verb."},
+    {q:"What will you do if you ____ your keys?",o:["lose","will lose","lost","losing"],why:"After IF, use present simple."},
+    {q:"If he ____ the exam, his parents will be proud.",o:["passes","will pass","passed","passing"],why:"After IF, use present simple: he passes."}
+  ],
+  translate:[
+    {es:"Si llueve, me quedaré en casa.",en:"If it rains, I will stay home.",extra:["would","stayed"]},
+    {es:"Si estudio, aprobaré el examen.",en:"If I study, I will pass the exam.",extra:["studied","would"]},
+    {es:"Si ella practica, mejorará.",en:"If she practices, she will improve.",extra:["practice","would"]},
+    {es:"Si no nos apuramos, perderemos el autobús.",en:"If we don't hurry, we will miss the bus.",extra:["didn't","would"]},
+    {es:"Si mañana hace sol, iremos a la playa.",en:"If it is sunny tomorrow, we will go to the beach.",extra:["was","would"]},
+    {es:"Si ganas el juego, estarás feliz.",en:"If you win the game, you will be happy.",extra:["won","would"]}
+  ],
+  make:[
+    {prompt:"Write a First Conditional sentence about the weather.",idea:"rain, umbrella, beach",example:"If it rains tonight, I will take an umbrella."},
+    {prompt:"Write a First Conditional sentence about school.",idea:"study, exam, teacher",example:"If I study every day, I will get a good grade."},
+    {prompt:"Write a First Conditional sentence about sports.",idea:"practice, win, team",example:"If we practice more, we will win the game."},
+    {prompt:"Write a First Conditional sentence about money.",idea:"save, buy, travel",example:"If I save money, I will buy a new phone."},
+    {prompt:"Write a First Conditional sentence about your friends.",idea:"invite, party, cake",example:"If my friends invite me, I will go to the party."},
+    {prompt:"Write a First Conditional sentence about a holiday.",idea:"travel, beach, hotel",example:"If we travel to Mazatlán, we will swim in the sea."}
+  ],
+  tf:[
+    {q:"If it rains tomorrow, I will stay home.",a:true,why:"IF + present simple, will + base verb. Perfect."},
+    {q:"If I will study, I will pass the exam.",a:false,why:"Never use will in the IF part. Say: If I study, I will pass."},
+    {q:"We use the First Conditional for possible future situations.",a:true,why:"It talks about real, possible situations in the future."},
+    {q:"If she practices, she would improve.",a:false,why:"The result needs will, not would: she will improve."},
+    {q:"If we don't hurry, we will miss the bus.",a:true,why:"Negative present simple in the IF part, will + base verb in the result."},
+    {q:"In the First Conditional, the verb after IF is in the past simple.",a:false,why:"After IF we use the present simple."},
+    {q:"If he will come, we will start the game.",a:false,why:"Say: If he comes, we will start the game."},
+    {q:"\"I will be happy if you come\" is a correct First Conditional sentence.",a:true,why:"The result can come first. Then we do not need a comma."}
+  ],
+  challenge:[
+    {q:"Which sentence has a MISTAKE?",o:["If it will rain, we will cancel the party.","If it rains, we will cancel the party.","We will cancel the party if it rains.","If it rains tomorrow, we won't go out."],why:"Never use will in the IF part. Say: If it rains."},
+    {q:"Complete the sentence: If you ____ me, I ____ you.",o:["call / will help","will call / help","called / would help","calling / will helping"],why:"IF + present simple (call), will + base verb (will help)."},
+    {q:"Which sentence is correct?",o:["If she doesn't study, she will fail.","If she won't study, she will fail.","If she didn't study, she will fail.","If she not studies, she will fail."],why:"Negative IF part: doesn't + base verb."},
+    {q:"Which sentence is a correct First Conditional with the result first?",o:["I will call you if I arrive.","I will call you if I will arrive.","I would call you if I arrive.","I call you if I will arrive."],why:"will + base verb first, then IF + present simple."},
+    {q:"Choose the best ending: If we run, we ____ late.",o:["won't be","wouldn't be","aren't being","not will be"],why:"Negative result: won't + base verb."},
+    {q:"Which sentence talks about a REAL possible future?",o:["If I win, I will travel.","If I were rich, I would travel.","If I had won, I would have travelled.","If I won, I would travel."],why:"The First Conditional is for real, possible future situations."}
+  ]
+};
+var queues={};
+function nextQ(id){
+  if(!queues[id]||!queues[id].length) queues[id]=shuffle(QB[id]);
+  return queues[id].pop();
+}
+
+var wheel=$('#wheel'), wctx=wheel.getContext('2d'), W=wheel.width, CX=W/2, R=CX-34, rot=0, spinning=false;
+function drawWheel(r){
+  wctx.clearRect(0,0,W,W);
+  wctx.beginPath();wctx.arc(CX,CX,CX-6,0,TAU);wctx.fillStyle='#0A0D2A';wctx.fill();
+  wctx.lineWidth=6;wctx.strokeStyle='#FFD23F';wctx.stroke();
+  var seg=TAU/CATS.length;
+  CATS.forEach(function(c,i){
+    var a0=r+i*seg, a1=a0+seg;
+    wctx.beginPath();wctx.moveTo(CX,CX);wctx.arc(CX,CX,R,a0,a1);wctx.closePath();
+    wctx.fillStyle=c.color;wctx.fill();
+    wctx.lineWidth=6;wctx.strokeStyle='#0D1030';wctx.stroke();
+    wctx.save();
+    wctx.translate(CX,CX);wctx.rotate(a0+seg/2);
+    wctx.textAlign='right';wctx.textBaseline='middle';wctx.fillStyle='#0D1030';
+    wctx.font="32px 'Lilita One','Trebuchet MS',sans-serif";
+    wctx.fillText(c.lines[0].toUpperCase(),R-22,-17);
+    wctx.fillText(c.lines[1].toUpperCase(),R-22,17);
+    wctx.restore();
+  });
+  var n=24;
+  for(var i=0;i<n;i++){
+    var a=i*TAU/n;
+    wctx.beginPath();wctx.arc(CX+Math.cos(a)*(CX-20),CX+Math.sin(a)*(CX-20),7,0,TAU);
+    wctx.fillStyle=i%2?'#FFFFFF':'#FF4F8B';wctx.fill();
+  }
+  wctx.beginPath();wctx.arc(CX,CX,58,0,TAU);wctx.fillStyle='#0D1030';wctx.fill();
+  wctx.lineWidth=6;wctx.strokeStyle='#FFD23F';wctx.stroke();
+  wctx.fillStyle='#FFD23F';wctx.font="34px 'Lilita One','Trebuchet MS',sans-serif";
+  wctx.textAlign='center';wctx.textBaseline='middle';wctx.fillText('IF',CX,CX+2);
+}
+drawWheel(rot);
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){drawWheel(rot);});}
+
+var spinBtn=$('#spinBtn'), qBox=$('#rQuestion');
+var rState={streak:0,correct:0,played:0,cur:null};
+
+function spin(){
+  if(spinning) return;
+  spinning=true;spinBtn.disabled=true;
+  var seg=TAU/CATS.length;
+  var idx=Math.floor(Math.random()*CATS.length);
+  var jitter=.15+Math.random()*.7;
+  var desired=mod(-Math.PI/2-(idx+jitter)*seg,TAU);
+  var from=rot;
+  var delta=mod(desired-mod(from,TAU),TAU);
+  var to=from+(5+Math.floor(Math.random()*3))*TAU+delta;
+  var dur=reduce?900:4800;
+  var t0=performance.now();
+  var lastIdx=Math.floor(mod(-Math.PI/2-from,TAU)/seg);
+  qBox.innerHTML='<div class="q-empty"><p class="big">Spinning...</p><p>Good luck!</p></div>';
+  function frame(now){
+    var p=Math.min(1,(now-t0)/dur);
+    var e=1-Math.pow(1-p,4);
+    rot=from+(to-from)*e;
+    drawWheel(rot);
+    var cur=Math.floor(mod(-Math.PI/2-rot,TAU)/seg);
+    if(cur!==lastIdx){lastIdx=cur;sfx.tick();}
+    if(p<1){requestAnimationFrame(frame);}
+    else{
+      rot=mod(to,TAU);
+      drawWheel(rot);
+      spinning=false;spinBtn.disabled=false;
+      renderRoulette(idx);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+spinBtn.addEventListener('click',spin);
+
+function updateRStats(){
+  $('#rStreak').textContent=rState.streak;
+  $('#rCorrect').textContent=rState.correct;
+  $('#rPlayed').textContent=rState.played;
+}
+function qHead(cat){
+  return '<div class="q-head"><span class="cat-pill" style="--c:'+cat.color+'">'+esc(cat.name)+'</span><span class="worth">Worth '+(cat.id==='challenge'?200:100)+' points</span></div>';
+}
+function lockQ(){
+  $$('button,input,textarea',qBox).forEach(function(e){e.disabled=true;});
+}
+function rFinish(ok,detail){
+  var c=rState.cur;
+  if(!c||c.done) return;
+  c.done=true;rState.played++;
+  var pts=0,bonus=0;
+  if(ok){
+    rState.streak++;rState.correct++;
+    pts=c.cat.id==='challenge'?200:100;
+    if(rState.streak>=3) bonus=50;
+    addXP(pts+bonus);sfx.ok();
+    burstAt(qBox,44);
+    pop('+'+(pts+bonus),qBox);
+  }else{
+    rState.streak=0;sfx.bad();shake(qBox);
+  }
+  updateRStats();
+  var fbEl=$('#rFb');
+  fbEl.innerHTML='<div class="fb '+(ok?'good':'bad')+'"><strong>'+(ok?'Correct!':'Not quite.')+'</strong>'+detail+
+    (ok?'<span class="pts">+'+pts+(bonus?' +'+bonus+' streak bonus':'')+'</span>':'')+
+    '<div style="margin-top:6px;color:var(--muted)">Press SPIN for the next question.</div></div>';
+  lockQ();
+}
+
+function checkFirstConditional(raw){
+  var s=raw.trim().replace(/[‘’`]/g,"'").replace(/\s+/g,' ');
+  if(s.split(' ').length<5) return {ok:false,msg:"Write a complete sentence with an IF part and a result."};
+  var low=s.toLowerCase().replace(/[.!?]+$/,'');
+  var ifPart,main;
+  if(low.indexOf('if ')===0){
+    var i=low.indexOf(',');
+    if(i<0) return {ok:false,msg:"Put a comma after the IF part: If ..., ..."};
+    ifPart=low.slice(3,i).trim();main=low.slice(i+1).trim();
+  }else{
+    var m=low.match(/^(.+?)\s+if\s+(.+)$/);
+    if(!m) return {ok:false,msg:"Start with If, or put if before the condition."};
+    main=m[1];ifPart=m[2];
+  }
+  if(ifPart.split(' ').length<2) return {ok:false,msg:"The IF part needs a subject and a verb."};
+  if(/(^|\s)(will|won't|would)(\s|$)|'ll(\s|$)/.test(ifPart)) return {ok:false,msg:"Do not use will in the IF part. Use the present simple."};
+  if(!/(^|\s)(will|won't)\s+(not\s+)?[a-z]+|'ll\s+(not\s+)?[a-z]+/.test(main)) return {ok:false,msg:"The result needs will + a base verb."};
+  return {ok:true};
+}
+
+function renderRoulette(ci){
+  var cat=CATS[ci], q=nextQ(cat.id);
+  rState.cur={cat:cat,q:q,done:false};
+  var html='', id=cat.id;
+
+  if(id==='complete'){
+    var p=q.q.split('____');
+    qBox.innerHTML=qHead(cat)+'<p class="qtext">'+esc(p[0])+'<input id="rAns" class="blank" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Your answer" size="10">'+esc(p[1])+'</p><p class="hintline">Write the missing verb form.</p><div class="actions"><button class="btn cyan" id="rCheck">Check answer</button></div><div id="rFb" aria-live="polite"></div>';
+    var inp=$('#rAns');
+    $('#rCheck').addEventListener('click',function(){
+      var v=norm(inp.value);
+      if(!v){shake(inp);return;}
+      var ok=q.answers.some(function(a){return norm(a)===v;});
+      rFinish(ok,ok?q.why:'Correct answer: <b>'+esc(q.answers[0])+'</b>. '+q.why);
+    });
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter') $('#rCheck').click();});
+  }
+  else if(id==='choose'||id==='challenge'){
+    var opts=shuffle(q.o.map(function(t,i){return {t:t,ok:i===0};}));
+    html=qHead(cat)+'<p class="qtext">'+esc(q.q)+'</p><div class="opts">'+
+      opts.map(function(o,i){return '<button class="opt" data-i="'+i+'"><span class="badge">'+'ABCD'.charAt(i)+'</span><span>'+esc(o.t)+'</span></button>';}).join('')+
+      '</div><div id="rFb" aria-live="polite"></div>';
+    qBox.innerHTML=html;
+    var btns=$$('.opt',qBox);
+    var right=opts.filter(function(o){return o.ok;})[0].t;
+    btns.forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.getAttribute('data-i'), ok=opts[i].ok;
+        btns.forEach(function(x,k){
+          if(opts[k].ok) x.classList.add('correct');
+          else if(k===i) x.classList.add('wrong');
+          else x.classList.add('dim');
+        });
+        rFinish(ok,ok?q.why:'Correct answer: <b>'+esc(right)+'</b>. '+q.why);
+      });
+    });
+  }
+  else if(id==='tf'){
+    qBox.innerHTML=qHead(cat)+'<p class="qtext">Is this sentence correct?</p><p class="qtext part-res">'+esc(q.q)+'</p><div class="opts two"><button class="opt" data-v="true">True</button><button class="opt" data-v="false">False</button></div><div id="rFb" aria-live="polite"></div>';
+    var tfb=$$('.opt',qBox);
+    tfb.forEach(function(b){
+      b.addEventListener('click',function(){
+        var v=b.getAttribute('data-v')==='true', ok=(v===q.a);
+        tfb.forEach(function(x){
+          var xv=x.getAttribute('data-v')==='true';
+          if(xv===q.a) x.classList.add('correct');
+          else if(x===b) x.classList.add('wrong');
+          else x.classList.add('dim');
+        });
+        rFinish(ok,(ok?'':'The sentence is <b>'+(q.a?'true':'false')+'</b>. ')+q.why);
+      });
+    });
+  }
+  else if(id==='translate'){
+    var bank=shuffle(q.en.split(' ').concat(q.extra)).map(function(t,i){return {t:t,id:i,used:false};});
+    var built=[];
+    qBox.innerHTML=qHead(cat)+'<p class="qtext">Translate into English:</p><p class="qtext es">'+esc(q.es)+'</p><div class="answer-zone" id="zone"></div><div class="bank" id="bank"></div><div class="actions"><button class="btn cyan" id="rCheck">Check answer</button><button class="btn ghost small" id="rClear">Clear</button></div><div id="rFb" aria-live="polite"></div>';
+    var zone=$('#zone'), bankEl=$('#bank');
+    var paint=function(){
+      zone.innerHTML=built.length?built.map(function(b,i){return '<button class="tile" data-k="'+i+'">'+esc(b.t)+'</button>';}).join(''):'<span class="placeholder">Tap the words below to build the sentence</span>';
+      bankEl.innerHTML=bank.map(function(b){return '<button class="tile" data-id="'+b.id+'"'+(b.used?' disabled':'')+'>'+esc(b.t)+'</button>';}).join('');
+    };
+    paint();
+    bankEl.addEventListener('click',function(e){
+      var t=e.target.closest('.tile');if(!t||t.disabled) return;
+      var b=bank.filter(function(x){return x.id===+t.getAttribute('data-id');})[0];
+      b.used=true;built.push(b);sfx.click();paint();
+    });
+    zone.addEventListener('click',function(e){
+      var t=e.target.closest('.tile');if(!t) return;
+      var k=+t.getAttribute('data-k'), b=built.splice(k,1)[0];
+      b.used=false;sfx.click();paint();
+    });
+    $('#rClear').addEventListener('click',function(){
+      built.forEach(function(b){b.used=false;});built=[];paint();
+    });
+    $('#rCheck').addEventListener('click',function(){
+      if(!built.length){shake(zone);return;}
+      var ans=built.map(function(b){return b.t;}).join(' ');
+      var ok=(ans===q.en);
+      rFinish(ok,ok?'Great translation!':'Correct answer: <b>'+esc(q.en)+'</b>');
+    });
+  }
+  else if(id==='make'){
+    qBox.innerHTML=qHead(cat)+'<p class="qtext">'+esc(q.prompt)+'</p><p class="hintline">Ideas: '+esc(q.idea)+'. Remember: IF + present simple, WILL + base verb.</p><textarea class="free" id="rAns" rows="2" placeholder="If ..., I will ..." aria-label="Your sentence"></textarea><div class="actions"><button class="btn cyan" id="rCheck">Check sentence</button></div><div id="rFb" aria-live="polite"></div>';
+    var ta=$('#rAns');
+    $('#rCheck').addEventListener('click',function(){
+      if(!ta.value.trim()){shake(ta);return;}
+      var r=checkFirstConditional(ta.value);
+      rFinish(r.ok,r.ok?'Your sentence follows the First Conditional structure. Example: <i>'+esc(q.example)+'</i>':esc(r.msg)+' Example: <i>'+esc(q.example)+'</i>');
+    });
+  }
+  updateRStats();
+}
+
+/* ====================================================
+   LOTTERY
+   ==================================================== */
+var PAIRS=[
+  ['If it rains...','We will stay home.'],
+  ['If I study...','I will pass the exam.'],
+  ['If she wins...','She will be happy.'],
+  ['If we save money...','We will travel.'],
+  ['If he scores a goal...','He will celebrate.'],
+  ['If the weather is nice...','They will play football.'],
+  ['If you eat too much candy...','You will feel sick.'],
+  ['If we hurry...','We will catch the bus.'],
+  ['If she misses the train...','She will be late.'],
+  ['If you press the button...','The door will open.'],
+  ['If it snows tonight...','The school will close.'],
+  ['If he forgets his umbrella...','He will get wet.']
+];
+var PCOL=['#FF4F8B','#35E0D2','#FFD23F','#9BEF3C','#FF8A3D','#8EA2FF','#F6A5FF','#7BF1A8'];
+var LINES=[
+  [0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],
+  [0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],
+  [0,5,10,15],[3,6,9,12]
+];
+var LINE_NAMES=['Row 1','Row 2','Row 3','Row 4','Column 1','Column 2','Column 3','Column 4','Diagonal 1','Diagonal 2'];
+var lot={cells:[],els:[],sel:null,matched:{},mcount:0,lines:{},lcount:0,mistakes:0,over:false};
+var boardEl=$('#board'), banner=$('#lotBanner');
+
+function setBanner(html,kind){
+  banner.className='banner'+(kind?' '+kind:'');
+  banner.innerHTML=html;
+}
+function updateLotStats(){
+  $('#lotPairs').textContent=(lot.mcount/2)+'/8';
+  $('#lotLines').textContent=lot.lcount;
+  $('#lotMistakes').textContent=lot.mistakes;
+}
+function newBoard(){
+  var chosen=shuffle(PAIRS.map(function(_,i){return i;})).slice(0,8);
+  var cells=[];
+  chosen.forEach(function(pi,k){
+    cells.push({pair:pi,type:'if',text:PAIRS[pi][0],col:k});
+    cells.push({pair:pi,type:'res',text:PAIRS[pi][1],col:k});
+  });
+  lot.cells=shuffle(cells);lot.sel=null;lot.matched={};lot.mcount=0;lot.lines={};lot.lcount=0;lot.mistakes=0;lot.over=false;
+  boardEl.innerHTML=lot.cells.map(function(c,i){
+    return '<button class="cell '+c.type+'" data-i="'+i+'" style="--pc:'+PCOL[c.col]+'">'+esc(c.text)+'</button>';
+  }).join('');
+  lot.els=$$('.cell',boardEl);
+  updateLotStats();
+  setBanner('<span>Tap an IF card to start.</span>');
+}
+boardEl.addEventListener('click',function(e){
+  var el=e.target.closest('.cell');
+  if(!el||lot.over) return;
+  cellClick(+el.getAttribute('data-i'));
+});
+function cellClick(i){
+  if(lot.matched[i]) return;
+  var els=lot.els, c=lot.cells[i];
+  if(lot.sel===null){lot.sel=i;els[i].classList.add('sel');sfx.click();return;}
+  if(lot.sel===i){els[i].classList.remove('sel');lot.sel=null;return;}
+  var a=lot.cells[lot.sel], j=lot.sel;
+  if(a.type===c.type){
+    els[j].classList.remove('sel');lot.sel=i;els[i].classList.add('sel');sfx.click();return;
+  }
+  els[j].classList.remove('sel');lot.sel=null;
+  if(a.pair===c.pair){doMatch(j,i);}else{doMismatch(j,i);}
+}
+function doMatch(j,i){
+  [j,i].forEach(function(k){
+    lot.matched[k]=true;
+    lot.els[k].classList.remove('hint');
+    lot.els[k].classList.add('matched');
+    lot.els[k].setAttribute('aria-label',lot.cells[k].text+' (matched)');
+  });
+  lot.mcount+=2;
+  addXP(50);sfx.ok();
+  burstAt(lot.els[i],24);pop('+50',lot.els[i]);
+  var msg='<span><strong>Match!</strong>'+esc(PAIRS[lot.cells[i].pair][0].replace('...',','))+' '+esc(lot.cells[i].type==='res'?lot.cells[i].text.toLowerCase().replace(/^./,function(m){return m;}):lot.cells[j].text.toLowerCase())+'</span>';
+  var ifText=lot.cells[i].type==='if'?lot.cells[i].text:lot.cells[j].text;
+  var resText=lot.cells[i].type==='res'?lot.cells[i].text:lot.cells[j].text;
+  msg='<span><strong>Match!</strong>'+esc(ifText.replace('...',','))+' '+esc(resText.charAt(0).toLowerCase()+resText.slice(1))+'</span>';
+  var newLines=[];
+  LINES.forEach(function(L,n){
+    if(!lot.lines[n]&&L.every(function(k){return lot.matched[k];})){lot.lines[n]=true;lot.lcount++;newLines.push(LINE_NAMES[n]);}
+  });
+  if(newLines.length){
+    addXP(100*newLines.length);
+    burstAt(lot.els[i],60);
+    msg='<span><strong>LINE!</strong>'+esc(newLines.join(' and '))+' complete. +'+(100*newLines.length)+' XP</span>';
+  }
+  updateLotStats();
+  if(lot.mcount===16){
+    lot.over=true;addXP(500);sfx.win();
+    burst(window.innerWidth/2,window.innerHeight/3,140);
+    setBanner('<span><strong>BOARD COMPLETE!</strong>You matched all 8 pairs with '+lot.mistakes+' mistake'+(lot.mistakes===1?'':'s')+'. +500 XP</span><button class="btn small lime" id="lotAgain">Play again</button>','win');
+    $('#lotAgain').addEventListener('click',newBoard);
+  }else{
+    setBanner(msg,newLines.length?'win':'');
+  }
+}
+function doMismatch(j,i){
+  lot.mistakes++;sfx.bad();
+  [j,i].forEach(function(k){
+    var el=lot.els[k];el.classList.remove('wrong');void el.offsetWidth;el.classList.add('wrong');
+    setTimeout(function(){el.classList.remove('wrong');},450);
+  });
+  updateLotStats();
+  setBanner('<span><strong>Not a match.</strong>Think about the logic: what is the natural result of that condition?</span>','bad');
+}
+$('#lotNew').addEventListener('click',newBoard);
+$('#lotHint').addEventListener('click',function(){
+  if(lot.over) return;
+  var idx=null;
+  if(lot.sel!==null){idx=lot.sel;}
+  else{
+    var open=[];
+    lot.cells.forEach(function(c,k){if(c.type==='if'&&!lot.matched[k]) open.push(k);});
+    if(open.length) idx=open[Math.floor(Math.random()*open.length)];
+  }
+  if(idx===null) return;
+  var pair=lot.cells[idx].pair, partner=-1;
+  lot.cells.forEach(function(c,k){if(k!==idx&&c.pair===pair) partner=k;});
+  [idx,partner].forEach(function(k){
+    var el=lot.els[k];el.classList.remove('hint');void el.offsetWidth;el.classList.add('hint');
+    setTimeout(function(){el.classList.remove('hint');},2000);
+  });
+  addXP(-25);sfx.click();
+  setBanner('<span><strong>Hint!</strong>These two cards belong together. -25 XP</span>');
+});
+
+/* ====================================================
+   QUIZ
+   ==================================================== */
+var QZ=[
+  {q:"If I study hard, I ____ the exam.",o:["will pass","pass","passed","passing"]},
+  {q:"If it rains tomorrow, we ____ at home.",o:["will stay","would stay","stayed","staying"]},
+  {q:"If she ____ early, she will catch the bus.",o:["leaves","will leave","left","leaving"]},
+  {q:"If you don't hurry, you ____ the train.",o:["will miss","would miss","missed","missing"]},
+  {q:"They ____ the match if they play well.",o:["will win","would win","won","winning"]},
+  {q:"What will you do if you ____ your keys?",o:["lose","will lose","lost","losing"]},
+  {q:"If he ____ his homework, the teacher will be angry.",o:["doesn't do","won't do","didn't do","not does"]},
+  {q:"We ____ a picnic if the weather is nice this weekend.",o:["will have","would have","had","having"]},
+  {q:"If they ____ the bus, they will be late.",o:["miss","will miss","missed","missing"]},
+  {q:"She will be happy if you ____ her a gift.",o:["give","will give","gave","giving"]},
+  {q:"If it is sunny on Saturday, we ____ to the beach.",o:["will go","would go","went","going"]},
+  {q:"If you ____ hard, you will improve.",o:["practice","will practice","practiced","practicing"]},
+  {q:"Which sentence is correct?",o:["If it rains, I will take an umbrella.","If it will rain, I will take an umbrella.","If it rained, I will take an umbrella.","If it rains, I would take an umbrella."]},
+  {q:"Choose the correct sentence:",o:["If we don't leave now, we will be late.","If we won't leave now, we will be late.","If we didn't leave now, we will be late.","If we not leave now, we will be late."]},
+  {q:"If Anna ____ the test, her parents will be proud.",o:["passes","will pass","passed","pass"]},
+  {q:"I ____ you if I find your phone.",o:["will call","would call","called","calling"]},
+  {q:"If they invite me, I ____ to the party.",o:["will go","would go","went","going"]},
+  {q:"If the movie is good, we ____ it again.",o:["will watch","would watch","watched","watching"]},
+  {q:"If you eat too much candy, you ____ sick.",o:["will feel","would feel","felt","feeling"]},
+  {q:"If he ____ the lottery, he will travel the world.",o:["wins","will win","won","winning"]}
+];
+var QN=15, QTIME=15;
+var quiz={active:false,list:[],i:0,score:0,correct:0,streak:0,best:0,t0:0,timerId:null,locked:false,opts:[],name:'Player'};
+var BOTS=[
+  {name:'Captain Will',score:2900,bot:true},
+  {name:'Ms. Present',score:2250,bot:true},
+  {name:'Professor If',score:1750,bot:true},
+  {name:'Rookie Rex',score:1100,bot:true},
+  {name:'Sleepy Sam',score:600,bot:true}
+];
+var memScores=[];
+try{var raw=JSON.parse(localStorage.getItem('fcc-scores')||'[]');if(Array.isArray(raw)) memScores=raw.filter(function(r){return r&&typeof r.score==='number'&&typeof r.name==='string';});}catch(e){}
+function saveScore(entry){
+  memScores.push(entry);
+  try{localStorage.setItem('fcc-scores',JSON.stringify(memScores.slice(-30)));}catch(e){}
+}
+
+function stopTimer(){if(quiz.timerId){clearInterval(quiz.timerId);quiz.timerId=null;}}
+function abandonQuiz(){
+  if(!quiz.active) return;
+  stopTimer();quiz.active=false;
+  $('#qzPlay').hidden=true;$('#qzEnd').hidden=true;$('#qzIntro').hidden=false;
+}
+function startQuiz(){
+  var nm=$('#playerName').value.trim().slice(0,14);
+  quiz.name=nm||'Player';
+  quiz.list=shuffle(QZ).slice(0,QN);
+  quiz.i=0;quiz.score=0;quiz.correct=0;quiz.streak=0;quiz.best=0;quiz.active=true;
+  $('#qzIntro').hidden=true;$('#qzEnd').hidden=true;$('#qzPlay').hidden=false;
+  $('#qzScore').textContent='0';$('#qzStreak').textContent='0';
+  showQuestion();
+}
+function showQuestion(){
+  var q=quiz.list[quiz.i];
+  quiz.locked=false;
+  quiz.opts=shuffle(q.o.map(function(t,i){return {t:t,ok:i===0};}));
+  $('#qzNum').textContent='Question '+(quiz.i+1)+' / '+QN;
+  $('#qzBar').style.width=(quiz.i/QN*100)+'%';
+  $('#qzProgress').setAttribute('aria-valuenow',String(quiz.i));
+  $('#qzText').textContent=q.q;
+  $('#qzFb').innerHTML='';
+  $('#qzNext').hidden=true;
+  $('#qzOpts').innerHTML=quiz.opts.map(function(o,k){
+    return '<button class="opt" data-k="'+k+'"><span class="badge">'+'ABCD'.charAt(k)+'</span><span>'+esc(o.t)+'</span></button>';
+  }).join('');
+  $('#timer').classList.remove('low');
+  $('#timerFill').style.width='100%';
+  $('#timerNum').textContent=String(QTIME);
+  quiz.t0=performance.now();
+  stopTimer();
+  quiz.timerId=setInterval(tickTimer,100);
+}
+function tickTimer(){
+  var left=Math.max(0,QTIME-(performance.now()-quiz.t0)/1000);
+  $('#timerFill').style.width=(left/QTIME*100)+'%';
+  $('#timerNum').textContent=String(Math.ceil(left));
+  if(left<=5) $('#timer').classList.add('low');
+  if(left<=0) answer(-1);
+}
+$('#qzOpts').addEventListener('click',function(e){
+  var b=e.target.closest('.opt');
+  if(!b||quiz.locked) return;
+  answer(+b.getAttribute('data-k'));
+});
+function answer(k){
+  if(quiz.locked||!quiz.active) return;
+  quiz.locked=true;stopTimer();
+  var left=Math.max(0,QTIME-(performance.now()-quiz.t0)/1000);
+  var ok=(k>=0&&quiz.opts[k].ok);
+  var btns=$$('#qzOpts .opt');
+  var rightIdx=0;
+  quiz.opts.forEach(function(o,i){if(o.ok) rightIdx=i;});
+  var base=0,speed=0,sb=0,total=0;
+  if(ok){
+    quiz.streak++;quiz.correct++;
+    if(quiz.streak>quiz.best) quiz.best=quiz.streak;
+    base=100;speed=Math.round(left/QTIME*50);
+    sb=quiz.streak>=3?Math.min(quiz.streak-2,5)*25:0;
+    total=base+speed+sb;
+    quiz.score+=total;addXP(total);
+  }else{
+    quiz.streak=0;
+  }
+  btns.forEach(function(x,i){
+    x.disabled=true;
+    if(i===rightIdx) x.classList.add('correct');
+    else if(i===k) x.classList.add('wrong');
+    else x.classList.add('dim');
+  });
+  $('#qzScore').textContent=quiz.score.toLocaleString('en-US');
+  $('#qzStreak').textContent=quiz.streak;
+  $('#qzBar').style.width=((quiz.i+1)/QN*100)+'%';
+  $('#qzProgress').setAttribute('aria-valuenow',String(quiz.i+1));
+  var letter='ABCD'.charAt(rightIdx), rightText=quiz.opts[rightIdx].t;
+  var fb;
+  if(ok){
+    sfx.ok();
+    var rb=btns[k];burstAt(rb,50);pop('+'+total,rb);
+    fb='<div class="fb good"><strong>Correct!</strong>+'+base+' base'+(speed?' +'+speed+' speed':'')+(sb?' +'+sb+' streak':'')+' = <span class="pts">+'+total+'</span></div>';
+  }else{
+    sfx.bad();shake($('#qzPlay'));
+    fb='<div class="fb bad"><strong>'+(k<0?"Time's up!":'Not quite.')+'</strong>Correct answer: <b>'+letter+') '+esc(rightText)+'</b>. Remember: IF + present simple, WILL + base verb.</div>';
+  }
+  $('#qzFb').innerHTML=fb;
+  var last=(quiz.i+1>=QN);
+  var nx=$('#qzNext');
+  nx.textContent=last?'See results':'Next question';
+  nx.hidden=false;
+  nx.focus({preventScroll:true});
+}
+$('#qzNext').addEventListener('click',function(){
+  if(!quiz.locked) return;
+  quiz.i++;
+  if(quiz.i>=QN) finishQuiz(); else showQuestion();
+});
+function rankOf(p){
+  if(p>=95) return {n:'Grammar Legend',c:'#FFD23F',m:'Perfect run! You are a First Conditional legend. Time to teach the class!'};
+  if(p>=80) return {n:'Conditional Master',c:'#9BEF3C',m:'Awesome work! You really know when to use IF + present simple, WILL + base verb.'};
+  if(p>=60) return {n:'Rising Challenger',c:'#35E0D2',m:'Great job! A little more practice and you will be a master.'};
+  if(p>=40) return {n:'Brave Explorer',c:'#FF8A3D',m:'Good effort! Read the rules again and try another round.'};
+  return {n:'Rookie Player',c:'#FF4F8B',m:'Every champion starts here. Review the Learn tab and play again!'};
+}
+function finishQuiz(){
+  stopTimer();quiz.active=false;
+  var pct=Math.round(quiz.correct/QN*100), rk=rankOf(pct);
+  $('#qzPlay').hidden=true;$('#qzEnd').hidden=false;
+  $('#endScore').textContent=quiz.score.toLocaleString('en-US');
+  $('#endPct').textContent=pct+'%';
+  $('#endCorrect').textContent=quiz.correct+'/'+QN;
+  $('#endStreak').textContent=quiz.best;
+  var rEl=$('#endRank');rEl.textContent=rk.n;rEl.style.setProperty('--rc',rk.c);
+  $('#endMsg').textContent=rk.m;
+  var me={name:quiz.name,score:quiz.score,t:Date.now()};
+  saveScore(me);
+  if(SCORES_URL){
+    $('#leaders').innerHTML='<li class="sep" style="display:block;border:0;background:none;padding:0">Sending your score...</li>';
+    $('#boardNote').textContent='Live leaderboard from everyone who played.';
+    api({action:'add',name:me.name,score:me.score,pct:pct,correct:quiz.correct,best:quiz.best,rank:rk.n}).then(function(d){
+      if(!d||!d.ok) throw new Error('bad response');
+      renderOnline(d,me);
+    }).catch(function(){
+      renderLeaders(me);
+      $('#boardNote').textContent='Could not reach the live leaderboard. Showing scores saved on this device.';
+    });
+  }else{
+    renderLeaders(me);
+  }
+  sfx.win();
+  if(pct>=40) burst(window.innerWidth/2,window.innerHeight/3,pct>=80?160:80);
+  window.scrollTo(0,0);
+}
+function renderLeaders(me){
+  var all=BOTS.concat(memScores).slice();
+  all.sort(function(a,b){return b.score-a.score;});
+  var pos=all.indexOf(me), TOP=6;
+  function row(e,i){
+    return '<li'+(e===me?' class="me"':'')+'><span class="pos">'+(i+1)+'</span><span class="nm">'+esc(e.name)+(e.bot?'<span class="bot">bot</span>':'')+(e===me?'<span class="bot">you</span>':'')+'</span><span class="sc">'+e.score.toLocaleString('en-US')+'</span></li>';
+  }
+  var html=all.slice(0,TOP).map(row).join('');
+  if(pos>=TOP) html+='<li class="sep" style="display:block;border:0;background:none;padding:0">...</li>'+row(me,pos);
+  $('#leaders').innerHTML=html;
+}
+/* ---------- Online leaderboard (Google Sheets) ---------- */
+function qs(o){return Object.keys(o).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(o[k]);}).join('&');}
+function api(params){
+  var url=SCORES_URL+(SCORES_URL.indexOf('?')<0?'?':'&')+qs(params);
+  var ctl=window.AbortController?new AbortController():null;
+  var t=setTimeout(function(){if(ctl) ctl.abort();},10000);
+  return fetch(url,ctl?{signal:ctl.signal}:{}).then(function(r){
+    clearTimeout(t);
+    if(!r.ok) throw new Error('http '+r.status);
+    return r.json();
+  }).catch(function(e){clearTimeout(t);throw e;});
+}
+function onlineRow(e,pos,mine){
+  return '<li'+(mine?' class="me"':'')+'><span class="pos">'+pos+'</span><span class="nm">'+esc(e.name)+(mine?'<span class="bot">you</span>':'')+'</span><span class="sc">'+(Number(e.score)||0).toLocaleString('en-US')+'</span></li>';
+}
+function renderOnline(d,me){
+  var top=d.top||[];
+  var html=top.map(function(e,i){return onlineRow(e,i+1,d.pos===i+1);}).join('');
+  if(d.pos>top.length) html+='<li class="sep" style="display:block;border:0;background:none;padding:0">...</li>'+onlineRow(me,d.pos,true);
+  $('#leaders').innerHTML=html||'<li class="sep" style="display:block;border:0;background:none;padding:0">No scores yet.</li>';
+}
+var introAt=0;
+function loadIntroBoard(){
+  if(!SCORES_URL) return;
+  var wrap=$('#introBoardWrap');
+  if(Date.now()-introAt<15000&&!wrap.hidden) return;
+  introAt=Date.now();
+  api({action:'top'}).then(function(d){
+    if(!d||!d.ok) return;
+    var top=d.top||[];
+    $('#introBoard').innerHTML=top.length?top.map(function(e,i){return onlineRow(e,i+1,false);}).join(''):'<li class="sep" style="display:block;border:0;background:none;padding:0">No scores yet. Be the first!</li>';
+    wrap.hidden=false;
+  }).catch(function(){});
+}
+
+$('#qzStart').addEventListener('click',startQuiz);
+$('#qzAgain').addEventListener('click',startQuiz);
+$('#playerName').addEventListener('keydown',function(e){if(e.key==='Enter') startQuiz();});
+
+/* ---------- Boot ---------- */
+newBoard();
+show((location.hash||'').slice(1)||'learn');
+})();
+</script>
+</body>
+</html>
